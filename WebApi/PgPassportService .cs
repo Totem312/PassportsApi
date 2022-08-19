@@ -2,10 +2,10 @@
 
 namespace WebApi
 {
-    public class PgPassportService : IServiseRepository
+    public class PassportService : IServiseRepository
     {
-        PgContext _db;
-        public PgPassportService(PgContext context)
+        ApplicationContext _db;
+        public PassportService(ApplicationContext context)
         {
             _db = context;
         }

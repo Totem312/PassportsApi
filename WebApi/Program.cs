@@ -2,12 +2,26 @@ using Microsoft.EntityFrameworkCore;
 using WebApi;
 using WebApi.Interfeses;
 
+
 var builder = WebApplication.CreateBuilder(args);
-string connection = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection));
+Enum.TryParse<Mode>(builder.Configuration["Mode"],true, out Mode mode);
+
+//string mode = builder.Configuration["Mode"].ToLower();
+switch (mode)
+{
+    case Mode.Pg:
+        string Sqlconnection = builder.Configuration.GetConnectionString("SqlConnection");
+        builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(Sqlconnection));
+        builder.Services.AddScoped<IServiseRepository, PassportService>();
+        break;
+    case Mode.Sql:
+        string Pgconnection = builder.Configuration.GetConnectionString("PgConnection");
+        builder.Services.AddDbContext<PgContext>(options => options.UseNpgsql(Pgconnection));
+        builder.Services.AddScoped<IServiseRepository, PgPassportService>();
+        break;
+}
 
 
-builder.Services.AddScoped<IServiseRepository, PassportService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -29,3 +43,10 @@ app.MapControllers();
 
 
 app.Run();
+
+ enum Mode
+{
+    Pg,
+    Sql,
+    error
+}
