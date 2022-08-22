@@ -1,5 +1,6 @@
 using Microsoft.Build.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Configuration;
 using System.Net;
 using WebApi;
 using WebApi.Interfases;
@@ -7,7 +8,7 @@ using WebApi.Interfeses;
 
 var builder = WebApplication.CreateBuilder(args);
 Enum.TryParse<Mode>(builder.Configuration["Mode"],true, out Mode mode);
-string wst=builder.Configuration["URL"];
+
 switch (mode)
 {
     case Mode.Pg:
@@ -21,7 +22,10 @@ switch (mode)
         builder.Services.AddScoped<IServiseRepository, PgPassportService>();
         break;
 }
+builder.Services.AddSingleton(_=>builder.Configuration.GetSection("Settings").Get<Settings>());
+builder.Services.AddTransient<IExtract, ExtractZipFileClass>();
 builder.Services.AddTransient<IDownload, DownloadFileClass>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -40,12 +44,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-app.Run(async context =>
-{
-    var zag = app.Services.GetService<IDownload>();
-   
-    await context.Response.;
-});
+
 app.Run();
 
  enum Mode

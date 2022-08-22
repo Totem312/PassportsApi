@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using WebApi.Interfases;
 using WebApi.Interfeses;
 
 namespace WebApi.Controllers
@@ -8,24 +9,39 @@ namespace WebApi.Controllers
     [Route("[Controller]")]
     public class OperationController : ControllerBase
     {
-       
         private readonly IServiseRepository _repository;
-        public OperationController(IServiseRepository repository)
+        IDownload _download;
+        IExtract _extract;
+        public OperationController(
+                      IServiseRepository repository,
+                      IDownload download,
+                      IExtract extract)
         {
             _repository = repository;
+            _download = download;
+            _extract = extract;
         }
 
         [HttpGet]
         public List<Passport> GetPasspo()
-        {     
-            
+        {
             return _repository.GetPassports();
+        }
+        [HttpGet("Ex")]
+        public void Download()
+        {
+            _download.Download();
+        }
+        [HttpGet("Zip")]
+        public void Extract()
+        {
+            _extract.Extract();
         }
 
         [HttpPost()]
         public IActionResult Create(Passport passport)
         {
-            
+
             _repository.Create(passport);
             return Ok();
 
@@ -38,10 +54,10 @@ namespace WebApi.Controllers
         }
 
         [HttpPut("{Id}")]
-        public IActionResult Update(int id,Passport uppassport)
-        {                   
-           _repository.Update(id, uppassport);
-                 return Ok();
+        public IActionResult Update(int id, Passport uppassport)
+        {
+            _repository.Update(id, uppassport);
+            return Ok();
         }
     }
 }

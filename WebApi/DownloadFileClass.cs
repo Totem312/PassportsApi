@@ -3,14 +3,16 @@ using WebApi.Interfases;
 
 namespace WebApi
 {
-    public class DownloadFileClass :IDownload
+    public class DownloadFileClass : Settings, IDownload
     {
-     public void Download()
+        private readonly Settings _url;
+        public DownloadFileClass(Settings url)
         {
-            var builder = WebApplication.CreateBuilder();
-            //string link = @"http://xn--b1ab2a0a.xn--b1aew.xn--p1ai/upload/expired-passports/list_of_expired_passports.csv.bz2";
-            //string link = @"https://naked-science.ru/wp-content/uploads/2018/04/field_image_istock-516189065.jpg";
-            string link = builder.Configuration["URL"];
+            _url=url;
+        }
+        public void Download()
+        {       
+            string link = _url.Url;
             string FolderPath = @"C:\Users\user\Desktop\DownloadFile\";
             string FileName = @"PassportList22";
             string FileExtension = link.Substring(link.LastIndexOf("."));
@@ -20,8 +22,6 @@ namespace WebApi
                 try
                 {
                     client.DownloadFile(new Uri(link), FolderPath + FileName + FileExtension);
-                   
-                   
                 }
                 catch (Exception exc)
                 {
