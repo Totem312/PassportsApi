@@ -1,10 +1,13 @@
 using Microsoft.Build.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Quartz;
 using System.Configuration;
 using System.Net;
 using WebApi;
+using WebApi.FileOperation;
 using WebApi.Interfases;
 using WebApi.Interfeses;
+using WebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 Enum.TryParse<Mode>(builder.Configuration["Mode"],true, out Mode mode);
@@ -12,24 +15,22 @@ Enum.TryParse<Mode>(builder.Configuration["Mode"],true, out Mode mode);
 switch (mode)
 {
     case Mode.Pg:
-        string Sqlconnection = builder.Configuration.GetConnectionString("SqlConnection");
-        builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(Sqlconnection));
+        builder.AddServicesPostrges();
         builder.Services.AddScoped<IServiseRepository, PassportService>();
         break;
     case Mode.Sql:
-        string Pgconnection = builder.Configuration.GetConnectionString("PgConnection");
-        builder.Services.AddDbContext<PgContext>(options => options.UseNpgsql(Pgconnection));
+        builder.AddServicesMsSql();
         builder.Services.AddScoped<IServiseRepository, PgPassportService>();
         break;
 }
 builder.Services.AddSingleton(_=>builder.Configuration.GetSection("Settings").Get<Settings>());
-builder.Services.AddTransient<IExtract, ExtractZipFileClass>();
-builder.Services.AddTransient<IDownload, DownloadFileClass>();
-
+builder.Services.AddTransient<IExtract, ExtractZipFile>();
+builder.Services.AddTransient<IDownload, WebApi.FileOperation.DownloadFile>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.AddServicesQuartz();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

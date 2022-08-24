@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebApi.Interfases;
 using WebApi.Interfeses;
+using Quartz;
 
 namespace WebApi.Controllers
 {
@@ -12,11 +13,15 @@ namespace WebApi.Controllers
         private readonly IServiseRepository _repository;
         IDownload _download;
         IExtract _extract;
+
         public OperationController(
                       IServiseRepository repository,
                       IDownload download,
-                      IExtract extract)
+                      IExtract extract
+
+                                         )
         {
+
             _repository = repository;
             _download = download;
             _extract = extract;
@@ -30,13 +35,18 @@ namespace WebApi.Controllers
         [HttpGet("Ex")]
         public void Download()
         {
-            _download.Download();
+            _download.DownloadAsync();
         }
-        [HttpGet("Zip")]
-        public void Extract()
-        {
-            _extract.Extract();
-        }
+        //[HttpGet("Quarz")]
+        //public void DownloadSheduler()
+        //{
+        //    _scheduler.Start();
+        //}
+        //[HttpGet("Zip")]
+        //public void Extract()
+        //{
+        //    _extract.Extract();
+        //}
 
         [HttpPost()]
         public IActionResult Create(Passport passport)
