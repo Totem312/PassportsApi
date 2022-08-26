@@ -23,9 +23,11 @@ switch (mode)
         builder.Services.AddScoped<IServiseRepository, PgPassportService>();
         break;
 }
+
 builder.Services.AddSingleton(_=>builder.Configuration.GetSection("Settings").Get<Settings>());
 builder.Services.AddTransient<IExtract, ExtractZipFile>();
 builder.Services.AddTransient<IDownload, WebApi.FileOperation.DownloadFile>();
+builder.Services.AddSingleton<IReadFile, ReadFile>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

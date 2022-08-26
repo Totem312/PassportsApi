@@ -13,15 +13,16 @@ namespace WebApi.Controllers
         private readonly IServiseRepository _repository;
         IDownload _download;
         IExtract _extract;
+        IReadFile _readFile;
 
         public OperationController(
                       IServiseRepository repository,
                       IDownload download,
-                      IExtract extract
-
+                      IExtract extract,
+                      IReadFile readFile
                                          )
         {
-
+            _readFile = readFile;
             _repository = repository;
             _download = download;
             _extract = extract;
@@ -42,11 +43,11 @@ namespace WebApi.Controllers
         //{
         //    _scheduler.Start();
         //}
-        //[HttpGet("Zip")]
-        //public void Extract()
-        //{
-        //    _extract.Extract();
-        //}
+        [HttpGet("Read")]
+        public void Extract()
+        {
+            _readFile.ReadAllFile();
+        }
 
         [HttpPost()]
         public IActionResult Create(Passport passport)

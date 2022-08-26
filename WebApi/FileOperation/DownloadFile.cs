@@ -4,7 +4,7 @@ using WebApi.Interfases;
 
 namespace WebApi.FileOperation
 {
-    public class DownloadFile : Settings, IDownload
+    public class DownloadFile :  IDownload
     {
         private readonly Settings _url;
         public DownloadFile(Settings url)
