@@ -2,6 +2,6 @@
 {
     public interface IReadFile
     {
-        public void ReadAllFile();
+        public Task ReadAllFile();
     }
 }

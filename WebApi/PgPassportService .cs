@@ -25,7 +25,7 @@ namespace WebApi
 
         }
      
-        public Passport Delite(int id)
+        public Passport Delete(int id)
         {
             Passport pass = new Passport();
             pass.Id = id;
@@ -45,6 +45,15 @@ namespace WebApi
 
             _db.SaveChanges();
             return passport;
+        }
+
+        public void AddToDb(Dictionary<uint, HashSet<uint>> dic)
+        {
+            _db.Add(dic);
+            _db.SaveChanges();
+            Console.WriteLine("Прошло+\n");
+            Console.WriteLine("Прошло+\n");
+            Console.WriteLine("Прошло+\n");
         }
     }
 }

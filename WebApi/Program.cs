@@ -16,18 +16,20 @@ switch (mode)
 {
     case Mode.Pg:
         builder.AddServicesPostrges();
-        builder.Services.AddScoped<IServiseRepository, PassportService>();
+        builder.Services.AddScoped<IServiseRepository, PgPassportService>();
+        builder.Services.AddScoped<IFileAddingToDb, AddToDbFilePg>();
         break;
     case Mode.Sql:
         builder.AddServicesMsSql();
-        builder.Services.AddScoped<IServiseRepository, PgPassportService>();
+        builder.Services.AddScoped<IServiseRepository, PassportService>();
         break;
 }
 
 builder.Services.AddSingleton(_=>builder.Configuration.GetSection("Settings").Get<Settings>());
 builder.Services.AddTransient<IExtract, ExtractZipFile>();
 builder.Services.AddTransient<IDownload, WebApi.FileOperation.DownloadFile>();
-builder.Services.AddSingleton<IReadFile, ReadFile>();
+builder.Services.AddScoped<IReadFile, ReadFile>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -49,7 +51,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
  enum Mode
 {
     Pg,

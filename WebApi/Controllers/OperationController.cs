@@ -12,20 +12,21 @@ namespace WebApi.Controllers
     {
         private readonly IServiseRepository _repository;
         IDownload _download;
-        IExtract _extract;
+     
         IReadFile _readFile;
+
 
         public OperationController(
                       IServiseRepository repository,
                       IDownload download,
                       IExtract extract,
                       IReadFile readFile
-                                         )
+,
+                      IFileAddingToDb fileAddingToDb )
         {
             _readFile = readFile;
             _repository = repository;
-            _download = download;
-            _extract = extract;
+            _download = download;       
         }
 
         [HttpGet]
@@ -38,29 +39,23 @@ namespace WebApi.Controllers
         {
             _download.DownloadAsync();
         }
-        //[HttpGet("Quarz")]
-        //public void DownloadSheduler()
-        //{
-        //    _scheduler.Start();
-        //}
+      
         [HttpGet("Read")]
         public void Extract()
         {
-            _readFile.ReadAllFile();
+           _readFile.ReadAllFile();
         }
 
         [HttpPost()]
         public IActionResult Create(Passport passport)
         {
-
             _repository.Create(passport);
             return Ok();
-
         }
         [HttpDelete("{Id}")]
         public IActionResult Delite(int id)
         {
-            _repository.Delite(id);
+            _repository.Delete(id);
             return Ok();
         }
 

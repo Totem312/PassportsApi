@@ -13,7 +13,7 @@ namespace WebApi.Services
         public static void AddServicesMsSql(this WebApplicationBuilder builder)
         {
             string Pgconnection = builder.Configuration.GetConnectionString("PgConnection");
-            builder.Services.AddDbContext<PgContext>(options => options.UseNpgsql(Pgconnection));
+            builder.Services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(Pgconnection));
         }
     }
 }

@@ -1,80 +1,61 @@
 ﻿using WebApi.Interfases;
 using static WebApi.FileOperation.ReadFile;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace WebApi.FileOperation
 {
-    public class ReadFile:IReadFile
+    public class ReadFile : IReadFile
     {
         private readonly Settings _settings;
-        public ReadFile(Settings settings)
+        private readonly IFileAddingToDb _addToDb;
+
+        public ReadFile(Settings settings, IFileAddingToDb addToDb)
         {
             _settings = settings;
+            _addToDb = addToDb;
         }
-       
-        public void ReadAllFile()
+
+        public async Task ReadAllFile()
         {
-            var lines = File.ReadAllLines(_settings.DecompressFileName);
-            var dict = new Dictionary<uint, HashSet<uint>>(9999);
-            Stopwatch stopwatch = new Stopwatch() ;
-            stopwatch.Start();         
-            for (uint i = 0; i < lines.Length; i++)
+            int count = 1;
+            var validationList = new List<List<Tuple<uint, uint>>>();
+            var chank = new List<Tuple<uint, uint>>();
+            Stopwatch watch = Stopwatch.StartNew();
+
+            using (StreamReader reader = new StreamReader(_settings.DecompressFileName))
             {
-                string[] columns = lines[i].Trim().Split(',');
-                if(uint.TryParse(columns[0], out var serial) && uint.TryParse(columns[1], out var number))
+                while (!reader.EndOfStream)
                 {
-                    if (dict.ContainsKey(serial))
+                    if (count > 100_000)
                     {
-                    dict[serial].Add(number);
+                        validationList.Add(chank);
+                        count = 1;
+                        chank = new List<Tuple<uint, uint>>();
+
                     }
-                    else dict.Add(serial, new HashSet<uint>(9999){ number});
-                }
-            }
-            stopwatch.Stop();
-            Console.WriteLine("Cловарь с копасити -  "+stopwatch.ElapsedMilliseconds);
-            stopwatch.Reset();
-            var dict2 = new Dictionary<uint, HashSet<uint>>();  
-            stopwatch.Start();
-            for (uint i = 0; i < lines.Length; i++)
-            {
-                string[] columns = lines[i].Trim().Split(',');
-                if (uint.TryParse(columns[0], out var serial) && uint.TryParse(columns[1], out var number))
-                {
-                    if (dict2.ContainsKey(serial))
+                    string[] columns = reader.ReadLine().Trim().Split(',');
+                    if (uint.TryParse(columns[0], out var serial) && uint.TryParse(columns[1], out var number))
                     {
-                        dict2[serial].Add(number);
+                        chank.Add(Tuple.Create(serial, number));
+                        count++;
                     }
-                    else dict2.Add(serial, new HashSet<uint>() { number });
                 }
+                validationList.Add(chank);
             }
-            stopwatch.Stop();
-            Console.WriteLine("Cловарь без копасити - "+stopwatch.ElapsedMilliseconds);
-            stopwatch.Reset();
-            List<Tuple<uint,uint>> values = new List<Tuple<uint, uint>>();
-            stopwatch.Start();
-            for (uint i = 0; i < lines.Length; i++)
+            ParallelOptions options = new ParallelOptions();
+            options.MaxDegreeOfParallelism = 6;
+            await Parallel.ForEachAsync(validationList, options, async (item, token) =>
             {
-                string[] columns = lines[i].Trim().Split(',');
-                if (uint.TryParse(columns[0], out var serial) && uint.TryParse(columns[1], out var number))
-                {
-                values.Add(new Tuple<uint, uint>(serial, number));
-                }
-            }
-            stopwatch.Stop();
-            Console.WriteLine("Лист без копасити - " + stopwatch.ElapsedMilliseconds);
-            stopwatch.Reset();
-            List<Tuple<uint, uint>> value = new List<Tuple<uint, uint>>(146430339);
-            stopwatch.Start();
-            for (uint i = 0; i < lines.Length; i++)
-            {
-                string[] columns = lines[i].Trim().Split(',');
-                if (uint.TryParse(columns[0], out var serial) && uint.TryParse(columns[1], out var number))
-                {
-                    value.Add(new Tuple<uint, uint>(serial, number));
-                }
-            }
-            stopwatch.Stop();
-            Console.WriteLine("Лист с копасити - " + stopwatch.ElapsedMilliseconds);
+                await _addToDb.AddToDb(item);
+                });
+
+
+            Console.WriteLine(new TimeSpan(watch.ElapsedTicks).TotalSeconds);
+            //Console.WriteLine($"Итого:{results.Sum() / 60}");
+            await _addToDb.ClearTable();
+
+
         }
 
     }
