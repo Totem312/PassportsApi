@@ -40,11 +40,11 @@ namespace WebApi.Controllers
             _download.DownloadAsync();
         }
       
-        [HttpGet("Read")]
-        public void Extract()
-        {
-           _readFile.ReadAllFile();
-        }
+        //[HttpGet("Read")]
+        //public void Extract()
+        //{
+        //   _readFile.ReadAllFile();
+        //}
 
         [HttpPost()]
         public IActionResult Create(Passport passport)

@@ -5,17 +5,17 @@ using WebApi.Interfases;
 namespace WebApi.FileOperation
 {
     public class ExtractZipFile : IExtract
-    {
-        Settings _settings;
+    { private readonly Settings _settings;
         public ExtractZipFile(Settings settings)
         {
             _settings = settings;
         }
-
-        public async Task ExtractAsync()
+        public async Task<string> ExtractAsync(String[] path)
         {
-            BZip2.Decompress(File.OpenRead(_settings.ZipFileName), File.Create(_settings.DecompressFileName), true);
+            string fileName=path[0]+_settings.ZipExtension;
+            BZip2.Decompress(File.OpenRead(path[0]), File.Create(fileName), true);
             await Task.CompletedTask;
+            return fileName;
         }
     }
 }

@@ -4,8 +4,7 @@
     {
         public string Mode { get; set; }
         public string Url { get; set; }
-        public  string ZipFileName { get; set; }
-        public string DecompressFileName { get; set; }
-        public string DownloadCronStartTime { get; set; }
+        public string ZipExtension { get; set; }
+        public string PathFolder { get; set; }
     }
 }

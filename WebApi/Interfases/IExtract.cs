@@ -2,6 +2,6 @@
 {
     public interface IExtract
     {
-        public Task ExtractAsync();
+        public Task<string> ExtractAsync(string[] path);
     }
 }
