@@ -13,7 +13,7 @@ namespace WebApi.FileOperation
         public async Task<string> ExtractAsync(String[] path)
         {
             string fileName=path[0]+_settings.ZipExtension;
-            BZip2.Decompress(File.OpenRead(path[0]), File.Create(fileName), true);
+            BZip2.Decompress(File.OpenRead(path[0] + path[1]), File.Create(fileName), true);
             await Task.CompletedTask;
             return fileName;
         }

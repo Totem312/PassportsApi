@@ -14,12 +14,12 @@ Enum.TryParse<Mode>(builder.Configuration["Mode"],true, out Mode mode);
 
 switch (mode)
 {
-    case Mode.Pg:
+    case Mode.Ms:
         builder.AddServicesPostrges();
         builder.Services.AddScoped<IServiseRepository, PgPassportService>();
         builder.Services.AddScoped<IFileAddingToDb, AddToDbFilePg>();
         break;
-    case Mode.Sql:
+    case Mode.Pg:
         builder.AddServicesMsSql();
         builder.Services.AddScoped<IServiseRepository, PassportService>();
         break;
@@ -54,6 +54,6 @@ app.Run();
  enum Mode
 {
     Pg,
-    Sql,
+    Ms,
     error
 }

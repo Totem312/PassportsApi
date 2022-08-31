@@ -29,7 +29,7 @@ namespace WebApi.FileOperation
             {
                 Console.WriteLine(exc.Message);
             }
-             string[] arrayPath = { fullPath + fileExtension, fileExtension };
+             string[] arrayPath = { fullPath, fileExtension };
             return arrayPath;
         }
     }
