@@ -1,17 +1,40 @@
+using Microsoft.Build.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Quartz;
+using System.Configuration;
+using System.Net;
 using WebApi;
+using WebApi.FileOperation;
+using WebApi.Interfases;
 using WebApi.Interfeses;
+using WebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-string connection = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection));
+Enum.TryParse<Mode>(builder.Configuration["Mode"],true, out Mode mode);
 
+switch (mode)
+{
+    case Mode.Pg:
+        builder.AddServicesPostrges();
+        builder.Services.AddScoped<IServiseRepository, PgPassportService>();
+        builder.Services.AddScoped<IFileAddingToDb, AddToDbFilePg>();
+        break;
+    case Mode.Sql:
+        builder.AddServicesMsSql();
+        builder.Services.AddScoped<IServiseRepository, PassportService>();
+        break;
+}
 
-builder.Services.AddScoped<IServiseRepository, PassportService>();
+builder.Services.AddSingleton(_=>builder.Configuration.GetSection("Settings").Get<Settings>());
+builder.Services.AddTransient<IExtract, ExtractZipFile>();
+builder.Services.AddTransient<IDownload, WebApi.FileOperation.DownloadFile>();
+builder.Services.AddScoped<IReadFile, ReadFile>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.AddServicesQuartz();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -27,5 +50,10 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-
 app.Run();
+ enum Mode
+{
+    Pg,
+    Sql,
+    error
+}
