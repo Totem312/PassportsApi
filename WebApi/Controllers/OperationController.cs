@@ -14,7 +14,7 @@ namespace WebApi.Controllers
         IDownload _download;
      
         IReadFile _readFile;
-
+        private string _fileName= @"C:\Users\user\Desktop\DownloadFile\2126265097.bz2.csv";
 
         public OperationController(
                       IServiseRepository repository,
@@ -39,12 +39,12 @@ namespace WebApi.Controllers
         {
             _download.DownloadAsync();
         }
-      
-        //[HttpGet("Read")]
-        //public void Extract()
-        //{
-        //   _readFile.ReadAllFile();
-        //}
+
+        [HttpGet("Read")]
+        public void Extract()
+        {
+            _readFile.ReadAllFile(_fileName);
+        }
 
         [HttpPost()]
         public IActionResult Create(Passport passport)
