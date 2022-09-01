@@ -1,8 +1,3 @@
-using Microsoft.Build.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Quartz;
-using System.Configuration;
-using System.Net;
 using WebApi;
 using WebApi.FileOperation;
 using WebApi.Interfases;
@@ -10,7 +5,7 @@ using WebApi.Interfeses;
 using WebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-Enum.TryParse<Mode>(builder.Configuration["Mode"],true, out Mode mode);
+Enum.TryParse(builder.Configuration["Mode"],true, out Mode mode);
 
 switch (mode)
 {
@@ -25,9 +20,11 @@ switch (mode)
         break;
 }
 
+
+
 builder.Services.AddSingleton(_=>builder.Configuration.GetSection("Settings").Get<Settings>());
 builder.Services.AddTransient<IExtract, ExtractZipFile>();
-builder.Services.AddTransient<IDownload, WebApi.FileOperation.DownloadFile>();
+builder.Services.AddTransient<IDownload, DownloadFile>();
 builder.Services.AddScoped<IReadFile, ReadFile>();
 
 builder.Services.AddControllers();
@@ -35,6 +32,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.AddServicesQuartz();
+
+builder.AddTaskManger();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -11,22 +11,21 @@ namespace WebApi.Controllers
     public class OperationController : ControllerBase
     {
         private readonly IServiseRepository _repository;
-        IDownload _download;
-     
-        IReadFile _readFile;
-
+        private readonly IDownload _download;
+        private readonly IReadFile _readFile;
+        private readonly IExtract _extract;
 
         public OperationController(
                       IServiseRepository repository,
                       IDownload download,
                       IExtract extract,
-                      IReadFile readFile
-,
+                      IReadFile readFile,
                       IFileAddingToDb fileAddingToDb )
         {
             _readFile = readFile;
             _repository = repository;
-            _download = download;       
+            _download = download;
+            _extract = extract;
         }
 
         [HttpGet]
@@ -34,14 +33,20 @@ namespace WebApi.Controllers
         {
             return _repository.GetPassports();
         }
-        [HttpGet("Ex")]
+        [HttpGet("Extract")]
+        public void Extract()
+        {
+            _extract.ExtractAsync();
+        }
+        
+        [HttpGet("Download")]
         public void Download()
         {
             _download.DownloadAsync();
         }
       
         [HttpGet("Read")]
-        public void Extract()
+        public void Read()
         {
            _readFile.ReadAllFile();
         }
