@@ -1,7 +1,7 @@
-﻿using WebApi.Interfases;
-using static WebApi.FileOperation.ReadFile;
-using System.Diagnostics;
-using System.Collections.Generic;
+﻿using System.Diagnostics;
+using WebApi.Interfases;
+using WebApi.ParallelManager;
+using WebApi.ParallelManager.Tasks;
 
 namespace WebApi.FileOperation
 {
@@ -9,18 +9,20 @@ namespace WebApi.FileOperation
     {
         private readonly Settings _settings;
         private readonly IFileAddingToDb _addToDb;
+        private readonly TaskManager _taskManager;
 
-        public ReadFile(Settings settings, IFileAddingToDb addToDb)
+        public ReadFile(Settings settings, IFileAddingToDb addToDb, TaskManager taskManager)
         {
             _settings = settings;
             _addToDb = addToDb;
+            _taskManager = taskManager;
         }
 
         public async Task ReadAllFile()
         {
             int count = 1;
             var validationList = new List<List<Tuple<uint, uint>>>();
-            var chank = new List<Tuple<uint, uint>>();
+            var chunk = new List<Tuple<uint, uint>>(100_000);
             Stopwatch watch = Stopwatch.StartNew();
 
             using (StreamReader reader = new StreamReader(_settings.DecompressFileName))
@@ -29,33 +31,33 @@ namespace WebApi.FileOperation
                 {
                     if (count > 100_000)
                     {
-                        validationList.Add(chank);
+                        validationList.Add(chunk);
                         count = 1;
-                        chank = new List<Tuple<uint, uint>>();
+                        chunk = new List<Tuple<uint, uint>>(100_000);
 
                     }
-                    string[] columns = reader.ReadLine().Trim().Split(',');
+                    string[] columns = (await reader.ReadLineAsync())!.Trim().Split(',');
                     if (uint.TryParse(columns[0], out var serial) && uint.TryParse(columns[1], out var number))
                     {
-                        chank.Add(Tuple.Create(serial, number));
+                        chunk.Add(Tuple.Create(serial, number));
                         count++;
                     }
                 }
-                validationList.Add(chank);
+                validationList.Add(chunk);
             }
-            ParallelOptions options = new ParallelOptions();
-            options.MaxDegreeOfParallelism = 6;
-            await Parallel.ForEachAsync(validationList, options, async (item, token) =>
+            
+            _taskManager.For<LoadDataTask>(0, validationList.Count, p =>
             {
-                await _addToDb.AddToDb(item);
+                var i = p.CurrentIndex;
+                p.Task = task => task.Execute(t =>
+                {
+                    t._addToDb.AddToDb(validationList[i]);
                 });
-
-
+            });
+            
             Console.WriteLine(new TimeSpan(watch.ElapsedTicks).TotalSeconds);
             //Console.WriteLine($"Итого:{results.Sum() / 60}");
             await _addToDb.ClearTable();
-
-
         }
 
     }
