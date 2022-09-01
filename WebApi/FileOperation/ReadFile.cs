@@ -5,18 +5,9 @@ using WebApi.ParallelManager.Tasks;
 
 namespace WebApi.FileOperation
 {
-    public class ReadFile : IReadFile
-    {
-        private readonly IFileAddingToDb _addToDb;
-        private readonly TaskManager _taskManager;
-
-        public ReadFile(Settings settings, IFileAddingToDb addToDb, TaskManager taskManager)
-        {
-            _addToDb = addToDb;
-            _taskManager = taskManager;
-        }
-
-        public async Task ReadAllFile(string fileName)
+    public class ManagerFile : IManagerFile
+    {  
+        public async Task<List<List<Tuple<uint, uint>>>> ReadAllFileAsync(string fileName)
         {
             int count = 1;
             var validationList = new List<List<Tuple<uint, uint>>>();
@@ -43,18 +34,7 @@ namespace WebApi.FileOperation
                 }
                 validationList.Add(chunk);
             }
-            
-            _taskManager.For<LoadDataTask>(0, validationList.Count, p =>
-            {
-                var i = p.CurrentIndex;
-                p.Task = task => task.Execute(t =>
-                {
-                    t._addToDb.AddToDb(validationList[i]);
-                });
-            });
-            
-            Console.WriteLine(new TimeSpan(watch.ElapsedTicks).TotalSeconds);
-            await _addToDb.ClearTable();
+            return validationList;          
         }
 
     }

@@ -1,9 +1,10 @@
 ﻿using WebApi.FileOperation;
 using WebApi.Interfases;
+using WebApi.Interfeses;
 
 namespace WebApi.ParallelManager.Tasks;
 
-public class LoadDataTask: MonadExecution<ReadFile>
+public class LoadDataTask: MonadExecution<PassportService>
 {
     /// <summary>
     /// Расчет сервисов
@@ -13,7 +14,7 @@ public class LoadDataTask: MonadExecution<ReadFile>
     /// Ctor
     /// </summary>
     /// <param name="type"></param>
-    public LoadDataTask(IReadFile type): base((ReadFile)type)
+    public LoadDataTask(IServiseRepository type): base((PassportService)type)
     {
         
     }

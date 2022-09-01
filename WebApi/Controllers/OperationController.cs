@@ -12,15 +12,15 @@ namespace WebApi.Controllers
     {
         private readonly IServiseRepository _repository;
         private readonly IDownload _download;
-        private readonly IReadFile _readFile;
+        private readonly IManagerFile _readFile;
         private readonly IExtract _extract;
 
         public OperationController(
                       IServiseRepository repository,
                       IDownload download,
                       IExtract extract,
-                      IReadFile readFile,
-                      IFileAddingToDb fileAddingToDb )
+                      IManagerFile readFile)
+                      
         {
             _readFile = readFile;
             _repository = repository;
@@ -38,17 +38,19 @@ namespace WebApi.Controllers
         {
             _extract.ExtractAsync(Array.Empty<string>());
         }
-        
+
         [HttpGet("Download")]
         public void Download()
         {
             _download.DownloadAsync();
         }
-      
+
         [HttpGet("Read")]
-        public void Read()
+        public async Task Read()
         {
-           _readFile.ReadAllFile(string.Empty);
+            var rows = await _readFile.ReadAllFileAsync(@"C:\Users\user\Desktop\DownloadFile\PassportList.csv");
+
+            await _repository.MultiThreadingAdd(rows);
         }
 
         [HttpPost()]
