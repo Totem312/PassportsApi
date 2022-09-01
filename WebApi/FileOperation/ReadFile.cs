@@ -1,23 +1,26 @@
-﻿using WebApi.Interfases;
-using static WebApi.FileOperation.ReadFile;
-using System.Diagnostics;
-using System.Collections.Generic;
+﻿using System.Diagnostics;
+using WebApi.Interfases;
+using WebApi.ParallelManager;
+using WebApi.ParallelManager.Tasks;
 
 namespace WebApi.FileOperation
 {
     public class ReadFile : IReadFile
     {
         private readonly IFileAddingToDb _addToDb;
-        public ReadFile(IFileAddingToDb addToDb)
+        private readonly TaskManager _taskManager;
+
+        public ReadFile(Settings settings, IFileAddingToDb addToDb, TaskManager taskManager)
         {
             _addToDb = addToDb;
+            _taskManager = taskManager;
         }
 
         public async Task ReadAllFile(string fileName)
         {
             int count = 1;
             var validationList = new List<List<Tuple<uint, uint>>>();
-            var chunk = new List<Tuple<uint, uint>>();
+            var chunk = new List<Tuple<uint, uint>>(100_000);
             Stopwatch watch = Stopwatch.StartNew();
 
             using (StreamReader reader = new StreamReader(fileName))
@@ -28,7 +31,7 @@ namespace WebApi.FileOperation
                     {
                         validationList.Add(chunk);
                         count = 1;
-                        chunk = new List<Tuple<uint, uint>>();
+                        chunk = new List<Tuple<uint, uint>>(100_000);
 
                     }
                     string[] columns = (await reader.ReadLineAsync())!.Trim().Split(',');
@@ -40,12 +43,16 @@ namespace WebApi.FileOperation
                 }
                 validationList.Add(chunk);
             }
-            ParallelOptions options = new ParallelOptions();
-            options.MaxDegreeOfParallelism = 6;
-            await Parallel.ForEachAsync(validationList, options, async (item, token) =>
+            
+            _taskManager.For<LoadDataTask>(0, validationList.Count, p =>
             {
-                await _addToDb.AddToDb(item);
+                var i = p.CurrentIndex;
+                p.Task = task => task.Execute(t =>
+                {
+                    t._addToDb.AddToDb(validationList[i]);
+                });
             });
+            
             Console.WriteLine(new TimeSpan(watch.ElapsedTicks).TotalSeconds);
             await _addToDb.ClearTable();
         }
