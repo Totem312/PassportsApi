@@ -36,7 +36,7 @@ namespace WebApi.Controllers
         [HttpGet("Extract")]
         public void Extract()
         {
-            _extract.ExtractAsync();
+            _extract.ExtractAsync(Array.Empty<string>());
         }
         
         [HttpGet("Download")]
@@ -48,7 +48,7 @@ namespace WebApi.Controllers
         [HttpGet("Read")]
         public void Read()
         {
-           _readFile.ReadAllFile();
+           _readFile.ReadAllFile(string.Empty);
         }
 
         [HttpPost()]
