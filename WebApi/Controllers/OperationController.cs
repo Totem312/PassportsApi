@@ -50,7 +50,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet("Read")]
-        public async Task Read()
+        public async Task ReadAsync()
         {
             var rows = await _readFile.ReadAllFileAsync(_file.GetFilePath);
 
