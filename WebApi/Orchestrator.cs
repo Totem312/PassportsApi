@@ -3,14 +3,14 @@ using WebApi.Interfeses;
 
 namespace WebApi
 {
-    public class Arcestrator
+    public class Orchestrator
     {
         private readonly IServiseRepository _repository;
         private readonly IDownload _download;
         private readonly IManagerFile _readFile;
         private readonly IExtract _extract;
 
-        public Arcestrator(
+        public Orchestrator(
                       IServiseRepository repository,
                       IDownload download,
                       IExtract extract,

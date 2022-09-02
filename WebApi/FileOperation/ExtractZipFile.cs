@@ -1,19 +1,21 @@
 ﻿using ICSharpCode.SharpZipLib.BZip2;
 using System.IO.Compression;
 using WebApi.Interfases;
+using WebApi.Services;
 
 namespace WebApi.FileOperation
 {
     public class ExtractZipFile : IExtract
-    { private readonly Settings _settings;
-        public ExtractZipFile(Settings settings)
-        {
-            _settings = settings;
+    {
+        IFilePathService _filePath;
+        public ExtractZipFile(IFilePathService filePath)
+        {         
+            _filePath = filePath;
         }
-        public async Task<string> ExtractAsync(String[] path)
+        public async Task<string> ExtractAsync(String path)
         {
-            string fileName=path[0]+_settings.ZipExtension;
-            BZip2.Decompress(File.OpenRead(path[0] + path[1]), File.Create(fileName), true);
+            string fileName = _filePath.GetFilePath;
+            BZip2.Decompress(File.OpenRead(path), File.Create(fileName), true);
             await Task.CompletedTask;
             return fileName;
         }

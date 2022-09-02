@@ -14,7 +14,7 @@ namespace WebApi.Jobs
         }
         public async Task Execute(IJobExecutionContext context)
         {
-            string[] filePath = await _download.DownloadAsync();
+            string filePath = await _download.DownloadAsync();
             string openFile=await _extract.ExtractAsync(filePath);
             //TODO:Необходима реализация добавление файла в бд 
 

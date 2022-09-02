@@ -2,6 +2,6 @@
 {
     public interface IDownload
     {
-       public Task<string[]> DownloadAsync();
+        Task<string> DownloadAsync();
     }
 }

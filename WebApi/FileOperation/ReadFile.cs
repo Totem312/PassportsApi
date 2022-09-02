@@ -12,8 +12,6 @@ namespace WebApi.FileOperation
             int count = 1;
             var validationList = new List<List<Tuple<uint, uint>>>();
             var chunk = new List<Tuple<uint, uint>>(100_000);
-            Stopwatch watch = Stopwatch.StartNew();
-
             using (StreamReader reader = new StreamReader(fileName))
             {
                 while (!reader.EndOfStream)
@@ -36,6 +34,6 @@ namespace WebApi.FileOperation
             }
             return validationList;          
         }
-
+       //TODO WriteFile Method
     }
 }
