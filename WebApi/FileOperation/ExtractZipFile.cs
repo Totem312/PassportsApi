@@ -1,7 +1,5 @@
 ﻿using ICSharpCode.SharpZipLib.BZip2;
-using System.IO.Compression;
 using WebApi.Interfases;
-using WebApi.Services;
 
 namespace WebApi.FileOperation
 {

@@ -1,4 +1,6 @@
-﻿namespace WebApi.Interfeses
+﻿using WebApi.Passports;
+
+namespace WebApi.Interfeses
 {
     public interface IServiseRepository
     {

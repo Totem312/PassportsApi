@@ -1,7 +1,7 @@
-﻿using Quartz;
-using System.Net;
+﻿using System.Net;
+using WebApi.Context;
 using WebApi.Interfases;
-using WebApi.Services;
+
 
 namespace WebApi.FileOperation
 {

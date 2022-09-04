@@ -1,6 +1,7 @@
 ﻿using WebApi.FileOperation;
 using WebApi.Interfases;
 using WebApi.Interfeses;
+using WebApi.Passports;
 
 namespace WebApi.ParallelManager.Tasks;
 

@@ -2,6 +2,7 @@
 using WebApi.Interfases;
 using WebApi.Interfeses;
 using Quartz;
+using WebApi.Passports;
 
 namespace WebApi.Controllers
 {

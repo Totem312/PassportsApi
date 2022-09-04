@@ -1,7 +1,7 @@
 ﻿using WebApi.Interfases;
 using WebApi.Interfeses;
 
-namespace WebApi
+namespace WebApi.Orchestrator
 {
     public class Orchestrator
     {

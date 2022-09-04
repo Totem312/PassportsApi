@@ -2,8 +2,9 @@
 using WebApi.Interfeses;
 using WebApi.ParallelManager.Tasks;
 using WebApi.ParallelManager;
+using WebApi.Context;
 
-namespace WebApi
+namespace WebApi.Passports
 {
     public class PassportService : IServiseRepository
     {
@@ -53,15 +54,15 @@ namespace WebApi
         }
         public async Task MultiThreadingAdd(List<List<Tuple<uint, uint>>> rows)
         {
-           _taskManager.For<LoadDataTask>(0, rows.Count, p =>
-            {          
-                var list = rows[p.CurrentIndex];
-                p.Task = task => task.Execute(async instance =>
-                { 
-                    await instance._db.Passports.AddRangeAsync(list.Select(x => new Passport { Series = (int)x.Item1, Number = (int)x.Item2 }));
-                    instance._db.SaveChanges();
-                });
-            });
+            _taskManager.For<LoadDataTask>(0, rows.Count, p =>
+             {
+                 var list = rows[p.CurrentIndex];
+                 p.Task = task => task.Execute(async instance =>
+                 {
+                     await instance._db.Passports.AddRangeAsync(list.Select(x => new Passport { Series = (int)x.Item1, Number = (int)x.Item2 }));
+                     instance._db.SaveChanges();
+                 });
+             });
             await Task.CompletedTask;
         }
     }

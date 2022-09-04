@@ -1,8 +1,8 @@
-﻿namespace WebApi
+﻿namespace WebApi.Context
 {
     public class ContextMode
     {
-      internal  enum Mode
+        internal enum Mode
         {
             Pg,
             Ms,

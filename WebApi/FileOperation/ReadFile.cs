@@ -1,8 +1,4 @@
-﻿using System.Diagnostics;
-using WebApi.Interfases;
-using WebApi.ParallelManager;
-using WebApi.ParallelManager.Tasks;
-
+﻿using WebApi.Interfases;
 namespace WebApi.FileOperation
 {
     public class ManagerFile : IManagerFile

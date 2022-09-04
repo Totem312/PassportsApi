@@ -1,4 +1,4 @@
-﻿namespace WebApi
+﻿namespace WebApi.Passports
 {
     public class Passport
     {
