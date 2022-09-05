@@ -1,7 +1,7 @@
 ﻿namespace WebApi.Interfases
 {
-    public interface IReadFile
+    public interface IManagerFile
     {
-        public Task ReadAllFile();
+        public Task <List<List<Tuple<uint, uint>>>> ReadAllFileAsync(string fileName);
     }
 }

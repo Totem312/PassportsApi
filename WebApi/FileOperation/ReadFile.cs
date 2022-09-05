@@ -1,31 +1,14 @@
-﻿using System.Diagnostics;
-using WebApi.Interfases;
-using WebApi.ParallelManager;
-using WebApi.ParallelManager.Tasks;
-
+﻿using WebApi.Interfases;
 namespace WebApi.FileOperation
 {
-    public class ReadFile : IReadFile
-    {
-        private readonly Settings _settings;
-        private readonly IFileAddingToDb _addToDb;
-        private readonly TaskManager _taskManager;
-
-        public ReadFile(Settings settings, IFileAddingToDb addToDb, TaskManager taskManager)
-        {
-            _settings = settings;
-            _addToDb = addToDb;
-            _taskManager = taskManager;
-        }
-
-        public async Task ReadAllFile()
+    public class ManagerFile : IManagerFile
+    {  
+        public async Task<List<List<Tuple<uint, uint>>>> ReadAllFileAsync(string fileName)
         {
             int count = 1;
             var validationList = new List<List<Tuple<uint, uint>>>();
             var chunk = new List<Tuple<uint, uint>>(100_000);
-            Stopwatch watch = Stopwatch.StartNew();
-
-            using (StreamReader reader = new StreamReader(_settings.DecompressFileName))
+            using (StreamReader reader = new StreamReader(fileName))
             {
                 while (!reader.EndOfStream)
                 {
@@ -45,20 +28,8 @@ namespace WebApi.FileOperation
                 }
                 validationList.Add(chunk);
             }
-            
-            _taskManager.For<LoadDataTask>(0, validationList.Count, p =>
-            {
-                var i = p.CurrentIndex;
-                p.Task = task => task.Execute(t =>
-                {
-                    t._addToDb.AddToDb(validationList[i]);
-                });
-            });
-            
-            Console.WriteLine(new TimeSpan(watch.ElapsedTicks).TotalSeconds);
-            //Console.WriteLine($"Итого:{results.Sum() / 60}");
-            await _addToDb.ClearTable();
+            return validationList;          
         }
-
+       //TODO WriteFile Method
     }
 }

@@ -1,19 +1,28 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WebApi.Context;
 
 namespace WebApi.Services
 {
     internal static class DbService
     {
-        
-        public static void AddServicesPostrges(this WebApplicationBuilder builder)
+        public static void AddDbService(this WebApplicationBuilder builder)
         {
-            string Sqlconnection = builder.Configuration.GetConnectionString("SqlConnection");
-            builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(Sqlconnection));
-        }
-        public static void AddServicesMsSql(this WebApplicationBuilder builder)
-        {
-            string Pgconnection = builder.Configuration.GetConnectionString("PgConnection");
-            builder.Services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(Pgconnection));
+            Enum.TryParse(builder.Configuration["Mode"], true, out ContextMode.Mode mode);
+            switch (mode)
+            {
+                case ContextMode.Mode.Ms:
+                    {
+                        string connection = builder.Configuration.GetConnectionString("SqlConnection");
+                        builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection));
+                    }
+                    break;
+                case ContextMode.Mode.Pg:
+                    {
+                        string connection = builder.Configuration.GetConnectionString("PgConnection");
+                        builder.Services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(connection));
+                    }
+                    break;
+            }
         }
     }
 }

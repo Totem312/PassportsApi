@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Data;
-namespace WebApi
+using WebApi.Passports;
+
+namespace WebApi.Context
 {
-  
+
     public class ApplicationContext : DbContext
     {
         public DbSet<Passport> Passports { get; set; } = null;
@@ -10,8 +11,8 @@ namespace WebApi
         public ApplicationContext(DbContextOptions<ApplicationContext> options)
             : base(options)
         {
-            Database.EnsureCreated();   
+            Database.EnsureCreated();
         }
-      
+
     }
 }

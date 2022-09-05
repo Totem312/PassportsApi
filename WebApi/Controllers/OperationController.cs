@@ -2,6 +2,7 @@
 using WebApi.Interfases;
 using WebApi.Interfeses;
 using Quartz;
+using WebApi.Passports;
 
 namespace WebApi.Controllers
 {
@@ -12,20 +13,24 @@ namespace WebApi.Controllers
     {
         private readonly IServiseRepository _repository;
         private readonly IDownload _download;
-        private readonly IReadFile _readFile;
+        private readonly IManagerFile _readFile;
         private readonly IExtract _extract;
+        private readonly IFilePathService _file;
 
         public OperationController(
                       IServiseRepository repository,
                       IDownload download,
                       IExtract extract,
-                      IReadFile readFile,
-                      IFileAddingToDb fileAddingToDb )
+                      IManagerFile readFile,
+                      IFilePathService file
+                      )
+                      
         {
             _readFile = readFile;
             _repository = repository;
             _download = download;
             _extract = extract;
+            _file = file;
         }
 
         [HttpGet]
@@ -36,19 +41,21 @@ namespace WebApi.Controllers
         [HttpGet("Extract")]
         public void Extract()
         {
-            _extract.ExtractAsync();
+            _extract.ExtractAsync(_file.GetArhPath);
         }
-        
+
         [HttpGet("Download")]
         public void Download()
         {
             _download.DownloadAsync();
         }
-      
+
         [HttpGet("Read")]
-        public void Read()
+        public async Task ReadAsync()
         {
-           _readFile.ReadAllFile();
+            var rows = await _readFile.ReadAllFileAsync(_file.GetFilePath);
+
+            await _repository.MultiThreadingAdd(rows);
         }
 
         [HttpPost()]

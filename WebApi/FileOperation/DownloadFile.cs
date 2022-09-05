@@ -1,33 +1,34 @@
-﻿using Quartz;
-using System.Net;
+﻿using System.Net;
+using WebApi.Context;
 using WebApi.Interfases;
+
 
 namespace WebApi.FileOperation
 {
-    public class DownloadFile :  IDownload
+    public class DownloadFile : IDownload
     {
         private readonly Settings _url;
-        public DownloadFile(Settings url)
+        IFilePathService _path;
+
+        public DownloadFile(Settings url, IFilePathService path)
         {
             _url = url;
+            _path = path;
         }
-        public async Task DownloadAsync()
+        public async Task<string> DownloadAsync()
         {
             string link = _url.Url;
-            string FolderPath = @"C:\Users\user\Desktop\DownloadFile\";
-            string FileName = @"PassportList22";
-            string FileExtension = link.Substring(link.LastIndexOf("."));
-
+            string filArhPath = _path.GetArhPath;
             using var client = new WebClient();
             try
             {
-                await client.DownloadFileTaskAsync(new Uri(link), FolderPath + FileName + FileExtension);
+                await client.DownloadFileTaskAsync(new Uri(link), filArhPath);
             }
             catch (Exception exc)
             {
                 Console.WriteLine(exc.Message);
             }
-
+            return filArhPath;
         }
     }
 }
