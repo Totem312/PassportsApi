@@ -14,6 +14,7 @@ namespace WebApi.Services
         }
         public string GetArhPath => Path.Combine(GetDirectory(), GetArhFileName());
         public string GetFilePath => Path.Combine(GetDirectory(), GetFileName());
+        public string GetTextFilePath =>Path.Combine(GetDirectory(), GetTextFileName());
         private string GetDirectory()
         {
             if (String.IsNullOrEmpty(_settings.PathTempFolder))
@@ -59,6 +60,10 @@ namespace WebApi.Services
 
             string fileName = arrayResult[arrayResult.Length - 1];
             return  fileName+ _date ;
+        }
+        private string GetTextFileName()
+        {
+            return $"{GetNameFile()}.{_settings.TextFormat}";
         }
     }
 }

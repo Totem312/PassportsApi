@@ -3,6 +3,7 @@ using WebApi.Interfeses;
 using WebApi.ParallelManager.Tasks;
 using WebApi.ParallelManager;
 using WebApi.Context;
+using WebApi.Interfases;
 
 namespace WebApi.Passports
 {
@@ -10,10 +11,16 @@ namespace WebApi.Passports
     {
         ApplicationContext _db;
         TaskManager _taskManager;
-        public PassportService(ApplicationContext context, TaskManager taskManager)
+        private readonly IManagerFile _manager;
+        private readonly IDataFile _dataFile;
+        private readonly IFilePathService _filePathService;
+        public PassportService(ApplicationContext context, TaskManager taskManager, IManagerFile manager, IDataFile dataFile, IFilePathService filePathService)
         {
             _db = context;
             _taskManager = taskManager;
+            _manager = manager;
+            _dataFile = dataFile;
+            _filePathService = filePathService; 
         }
 
         public List<Passport> GetPassports()
@@ -51,6 +58,17 @@ namespace WebApi.Passports
         public async Task ClearTable()
         {
             await _db.Database.ExecuteSqlRawAsync("TRUNCATE TABLE [Passports]");
+        }
+        public async Task WriteTextFile()
+        {
+            string wee = (@"C:\Users\user\Desktop\DownloadFile\this.csv");
+            //string we = _filePathService.GetTextFilePath;
+            //var validList = await _manager.ReadAllFileAsync(@"C:\Users\user\Desktop\DownloadFile\list_of_expired_passports.csv");
+            //await _dataFile.WriteFile(validList);
+            await _db.Database.ExecuteSqlRawAsync(@$"copy public.passports(serial,number)from'{wee}'WITH(format csv,HEADER TRUE,DELIMITER(','))");
+            //await _db.Database.ExecuteSqlRawAsync("DROP TABLE ");
+            Console.WriteLine("дошли");
+
         }
         public async Task MultiThreadingAdd(List<List<Tuple<uint, uint>>> rows)
         {

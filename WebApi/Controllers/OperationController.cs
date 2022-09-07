@@ -43,6 +43,11 @@ namespace WebApi.Controllers
         {
             _extract.ExtractAsync(_file.GetArhPath);
         }
+        [HttpGet("Write")]
+        public void Write()
+        {
+            _repository.WriteTextFile();
+        }
 
         [HttpGet("Download")]
         public void Download()
