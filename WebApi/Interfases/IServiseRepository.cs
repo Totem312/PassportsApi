@@ -8,7 +8,7 @@ namespace WebApi.Interfeses
         public Passport Create(Passport passport);
         public Passport Delete(int id);
         public Passport Update(int id, Passport uppassport);
-        public Task MultiThreadingAdd(List<List<Tuple<uint, uint>>> rows);
+        public Task MultiThreadingAdd(List<List<(uint, uint)>> rows);
         public Task ClearTable();
         public Task WriteTextFile();
 

@@ -4,6 +4,8 @@ using WebApi.ParallelManager.Tasks;
 using WebApi.ParallelManager;
 using WebApi.Context;
 using WebApi.Interfases;
+using Microsoft.Data.SqlClient;
+using System.Net.WebSockets;
 
 namespace WebApi.Passports
 {
@@ -14,13 +16,17 @@ namespace WebApi.Passports
         private readonly IManagerFile _manager;
         private readonly IDataFile _dataFile;
         private readonly IFilePathService _filePathService;
-        public PassportService(ApplicationContext context, TaskManager taskManager, IManagerFile manager, IDataFile dataFile, IFilePathService filePathService)
+        public PassportService(ApplicationContext context,
+            TaskManager taskManager,
+            IManagerFile manager,
+            IDataFile dataFile,
+            IFilePathService filePathService)
         {
             _db = context;
             _taskManager = taskManager;
             _manager = manager;
             _dataFile = dataFile;
-            _filePathService = filePathService; 
+            _filePathService = filePathService;
         }
 
         public List<Passport> GetPassports()
@@ -61,16 +67,32 @@ namespace WebApi.Passports
         }
         public async Task WriteTextFile()
         {
-            string wee = (@"C:\Users\user\Desktop\DownloadFile\this.csv");
-            //string we = _filePathService.GetTextFilePath;
-            //var validList = await _manager.ReadAllFileAsync(@"C:\Users\user\Desktop\DownloadFile\list_of_expired_passports.csv");
-            //await _dataFile.WriteFile(validList);
-            await _db.Database.ExecuteSqlRawAsync(@$"copy public.passports(serial,number)from'{wee}'WITH(format csv,HEADER TRUE,DELIMITER(','))");
-            //await _db.Database.ExecuteSqlRawAsync("DROP TABLE ");
-            Console.WriteLine("дошли");
+
+            var validationList = await _manager.ReadAllFileAsync(@"C:\Users\user\Desktop\DownloadFile\list_of_expired_passports20220907165255.csv");
+            await _dataFile.WriteFileAsync(validationList);
+            string query = $"call load_passports('{_filePathService.GetTextFilePath}')";
+            try
+            {
+                await _db.Database.ExecuteSqlRawAsync(query);
+            }
+            catch (Exception)
+            {
+
+            }
+            
+
+            //_taskManager.For<LoadDataTask>(0, 1, p =>
+            //{
+            //    p.Task = task => task.Execute(async instance =>
+            //    {
+            //        await instance._db.Database.ExecuteSqlRawAsync(query);
+            //    });
+            //});
+                         
+            Console.WriteLine("дошли -");
 
         }
-        public async Task MultiThreadingAdd(List<List<Tuple<uint, uint>>> rows)
+        public async Task MultiThreadingAdd(List<List<(uint, uint)>> rows)
         {
             _taskManager.For<LoadDataTask>(0, rows.Count, p =>
              {

@@ -8,7 +8,7 @@ namespace WebApi.Passports
     {
         [Column("id")]
         public int Id { get; set; }
-        [Column("serial")]
+        [Column("series")]
         public int Series { get; set; }
         [Column("number")]
         public int Number { get; set; }

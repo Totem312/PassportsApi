@@ -9,17 +9,17 @@ namespace WebApi.FileOperation
         {
             _path = path;
         }
-        public async Task WriteFile(List<List<Tuple<uint, uint>>> listTuple)
+        public async Task WriteFileAsync(List<List<(uint series, uint number)>> listTuple)
         {
             using (StreamWriter writer = new StreamWriter(_path.GetTextFilePath))
             {
-                var heder = new Tuple<string, string>("serial", "number");
-                await writer.WriteLineAsync($"{heder.Item1},{heder.Item2}");
+                (string series, string number) heder = new("series", "number");
+                await writer.WriteLineAsync($"{heder.series},{heder.number}");
                 for (int i = 0; i < listTuple.Count; i++)
                 {
                     foreach (var tuple in listTuple[i])
                     {
-                        await writer.WriteLineAsync($"{tuple.Item1},{tuple.Item2}");
+                        await writer.WriteLineAsync($"{tuple.series},{tuple.number}");
                     }
                 }
             };

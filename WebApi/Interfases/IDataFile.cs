@@ -2,6 +2,6 @@
 {
     public interface IDataFile
     {
-        Task WriteFile(List<List<Tuple<uint, uint>>> tuples);
+        Task WriteFileAsync(List<List<(uint series, uint number)>> tuples);
     }
 }
