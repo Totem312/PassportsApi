@@ -29,7 +29,7 @@ namespace WebApi.Services
             else
             {
                 DirectoryInfo dirInfo = new DirectoryInfo(_settings.PathTempFolder);
-                if (!dirInfo.Exists)
+                if (!dirInfo.Exists) 
                 {
                     dirInfo.Create();
                 }

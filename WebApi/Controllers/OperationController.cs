@@ -32,11 +32,15 @@ namespace WebApi.Controllers
             _extract = extract;
             _file = file;
         }
-
         [HttpGet]
-        public List<Passport> GetPasspo()
+        public List<Passport> GetPassports()
         {
-            return _repository.GetPassports();
+            return _repository.GetAllPassports();
+        }
+        [HttpGet("Id")]
+        public Passport GetPassport(string id)
+        {
+            return  _repository.GetPassport(id);
         }
         [HttpGet("Extract")]
         public void Extract()
@@ -65,6 +69,12 @@ namespace WebApi.Controllers
 
         [HttpPost()]
         public IActionResult Create(Passport passport)
+        {
+            _repository.Create(passport);
+            return Ok();
+        }
+        [HttpPost("temp")]
+        public IActionResult CreateTemp(Passport passport)
         {
             _repository.Create(passport);
             return Ok();

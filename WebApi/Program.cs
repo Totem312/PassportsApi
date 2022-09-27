@@ -25,6 +25,8 @@ builder.AddTaskManger();
 
 var app = builder.Build();
 
+app.UsePostgres();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

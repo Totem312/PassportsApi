@@ -24,5 +24,11 @@ namespace WebApi.Services
                     break;
             }
         }
+        public static void UsePostgres(this IApplicationBuilder app)
+        {
+            using var serviceScope = app.ApplicationServices.CreateScope();
+            using var context = serviceScope.ServiceProvider.GetService<ApplicationContext>();
+            context?.Database.Migrate();
+        }
     }
 }

@@ -4,8 +4,7 @@ using WebApi.ParallelManager.Tasks;
 using WebApi.ParallelManager;
 using WebApi.Context;
 using WebApi.Interfases;
-using Microsoft.Data.SqlClient;
-using System.Net.WebSockets;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Passports
 {
@@ -28,10 +27,16 @@ namespace WebApi.Passports
             _dataFile = dataFile;
             _filePathService = filePathService;
         }
-
-        public List<Passport> GetPassports()
+        public Passport GetPassport(string id)
         {
-            return _db.Passports.ToList();
+            return _db.Passports.FirstOrDefault(x => x.Id == id);
+
+        }
+        public List<Passport> GetAllPassports()
+        {
+            _db.Passports.FromSqlRaw("Exec tempPass");
+            //return _db.Passports.ToList();
+            return null;
         }
 
         public Passport Create(Passport passport)
@@ -40,11 +45,9 @@ namespace WebApi.Passports
             _db.SaveChanges();
             return passport;
         }
-
         public Passport Delete(int id)
         {
             Passport pass = new Passport();
-            pass.Id = id;
             _db.Passports.Attach(pass);
             _db.Passports.Remove(pass);
             _db.SaveChanges();
@@ -65,32 +68,22 @@ namespace WebApi.Passports
         {
             await _db.Database.ExecuteSqlRawAsync("TRUNCATE TABLE [Passports]");
         }
+
         public async Task WriteTextFile()
         {
-
-            var validationList = await _manager.ReadAllFileAsync(@"C:\Users\user\Desktop\DownloadFile\list_of_expired_passports20220907165255.csv");
-            await _dataFile.WriteFileAsync(validationList);
-            string query = $"call load_passports('{_filePathService.GetTextFilePath}')";
-            try
+            var Q = "C:\\Users\\user\\Desktop\\DownloadFile\\data.csv";
+            for (int i = 0; i < 1; i++)
             {
-                await _db.Database.ExecuteSqlRawAsync(query);
+                string query = $"call load_passports('{Q}')";
+                try
+                {
+                    await _db.Database.ExecuteSqlRawAsync(query);
+                }
+                catch
+                {
+                    break;
+                }
             }
-            catch (Exception)
-            {
-
-            }
-            
-
-            //_taskManager.For<LoadDataTask>(0, 1, p =>
-            //{
-            //    p.Task = task => task.Execute(async instance =>
-            //    {
-            //        await instance._db.Database.ExecuteSqlRawAsync(query);
-            //    });
-            //});
-                         
-            Console.WriteLine("дошли -");
-
         }
         public async Task MultiThreadingAdd(List<List<(uint, uint)>> rows)
         {
