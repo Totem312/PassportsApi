@@ -4,7 +4,6 @@ using WebApi.ParallelManager.Tasks;
 using WebApi.ParallelManager;
 using WebApi.Context;
 using WebApi.Interfases;
-using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Passports
 {
@@ -27,16 +26,14 @@ namespace WebApi.Passports
             _dataFile = dataFile;
             _filePathService = filePathService;
         }
-        public Passport GetPassport(string id)
+        public Passport GetPassport(int serial, int number)
         {
-            return _db.Passports.FirstOrDefault(x => x.Id == id);
+            return _db.Passports.FirstOrDefault(x => x.Id == string.Concat(serial,number));
 
         }
         public List<Passport> GetAllPassports()
         {
-            _db.Passports.FromSqlRaw("Exec tempPass");
-            //return _db.Passports.ToList();
-            return null;
+            return _db.Passports.ToList();
         }
 
         public Passport Create(Passport passport)
@@ -53,14 +50,28 @@ namespace WebApi.Passports
             _db.SaveChanges();
             return null;
         }
+        public List<History> GetPassportHistory(int serial, int number)
+        {
+           return _db.History.Where(x => x.PassportId == string.Concat(serial, number)).ToList();
+        }
 
-        public Passport Update(int id, Passport uppassport)
+        public List<History> GetAllChanges(DateTime beginTime, DateTime endTime)
+        {
+            return _db.History.Where(x => x.DateChangeStatus <= beginTime).ToList();
+        }
+        public Passport Update(string id, Passport uppassport)
         {
             Passport passport = _db.Passports.Find(id);
-
-            passport.Number = uppassport.Number;
-            passport.Series = uppassport.Series;
-
+            if (uppassport.Series == 0 || uppassport.Number == 0)
+            {
+                passport.Status = uppassport.Status;
+            }
+            else
+            {
+                passport.Number = uppassport.Number;
+                passport.Series = uppassport.Series;
+                passport.Status = uppassport.Status;
+            }
             _db.SaveChanges();
             return passport;
         }
@@ -71,19 +82,7 @@ namespace WebApi.Passports
 
         public async Task WriteTextFile()
         {
-            var Q = "C:\\Users\\user\\Desktop\\DownloadFile\\data.csv";
-            for (int i = 0; i < 1; i++)
-            {
-                string query = $"call load_passports('{Q}')";
-                try
-                {
-                    await _db.Database.ExecuteSqlRawAsync(query);
-                }
-                catch
-                {
-                    break;
-                }
-            }
+            await _db.Database.ExecuteSqlRawAsync("call tempPass()");
         }
         public async Task MultiThreadingAdd(List<List<(uint, uint)>> rows)
         {

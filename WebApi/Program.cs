@@ -4,7 +4,7 @@ using WebApi.Interfases;
 using WebApi.Interfeses;
 using WebApi.Passports;
 using WebApi.Services;
-
+using WebApi.SqlOpration;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddDbService();
@@ -15,6 +15,7 @@ builder.Services.AddTransient<IDownload, DownloadFile>();
 builder.Services.AddScoped<IManagerFile, ManagerFile>();
 builder.Services.AddScoped<IFilePathService, FilePathService>();
 builder.Services.AddScoped<IDataFile, DataFile>();
+builder.Services.AddScoped<IUpdater, Updater>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

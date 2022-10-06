@@ -11,4 +11,5 @@ false
 FROM temppassports t 
 where not exists(Select concat(t.series,t.number)
  from passports as p where concat(t.series,t.number)=p."Id");
+ drop table  temppassports;
 end $createtable$;

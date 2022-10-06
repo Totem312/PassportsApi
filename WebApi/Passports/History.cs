@@ -11,7 +11,7 @@ namespace WebApi.Passports
         public long Id { get; set; }
         [Column("status")]
         public bool Status { get; set; }
-        [Column("dateChangeStatus")]
+        [Column("date_change_status")]
         public DateTime DateChangeStatus { get; set; }
 
         [Column("passport_id")]

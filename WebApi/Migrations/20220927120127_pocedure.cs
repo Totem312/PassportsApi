@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -18,6 +16,9 @@ namespace WebApi.Migrations
 
             var validataProc = Path.Combine("SQL", "ValidateDataScript.sql");
             migrationBuilder.Sql(File.ReadAllText(validataProc));
+
+            var triggerFunc = Path.Combine("SQL", "tgFunction.sql");
+            migrationBuilder.Sql(File.ReadAllText(triggerFunc));
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -28,8 +29,12 @@ namespace WebApi.Migrations
 
             var copyProcDrop = "DROP procedure load_passports ";
             migrationBuilder.Sql(copyProcDrop);
+
             var ValidataProcDrop = "DROP procedure validdata ";
             migrationBuilder.Sql(ValidataProcDrop);
+
+            var triggerFunc = ("drop function passport_insert_update_tg");
+            migrationBuilder.Sql(triggerFunc);
         }
     }
 }
