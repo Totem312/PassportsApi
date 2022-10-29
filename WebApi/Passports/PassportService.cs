@@ -3,6 +3,7 @@ using WebApi.Interfeses;
 using WebApi.ParallelManager.Tasks;
 using WebApi.ParallelManager;
 using WebApi.Context;
+using WebApi.Interfases;
 
 namespace WebApi.Passports
 {
@@ -10,13 +11,27 @@ namespace WebApi.Passports
     {
         ApplicationContext _db;
         TaskManager _taskManager;
-        public PassportService(ApplicationContext context, TaskManager taskManager)
+        private readonly IManagerFile _manager;
+        private readonly IDataFile _dataFile;
+        private readonly IFilePathService _filePathService;
+        public PassportService(ApplicationContext context,
+            TaskManager taskManager,
+            IManagerFile manager,
+            IDataFile dataFile,
+            IFilePathService filePathService)
         {
             _db = context;
             _taskManager = taskManager;
+            _manager = manager;
+            _dataFile = dataFile;
+            _filePathService = filePathService;
         }
+        public Passport GetPassport(int serial, int number)
+        {
+            return _db.Passports.FirstOrDefault(x => x.Id == string.Concat(serial,number));
 
-        public List<Passport> GetPassports()
+        }
+        public List<Passport> GetAllPassports()
         {
             return _db.Passports.ToList();
         }
@@ -27,24 +42,36 @@ namespace WebApi.Passports
             _db.SaveChanges();
             return passport;
         }
-
         public Passport Delete(int id)
         {
             Passport pass = new Passport();
-            pass.Id = id;
             _db.Passports.Attach(pass);
             _db.Passports.Remove(pass);
             _db.SaveChanges();
             return null;
         }
+        public List<History> GetPassportHistory(int serial, int number)
+        {
+           return _db.History.Where(x => x.PassportId == string.Concat(serial, number)).ToList();
+        }
 
-        public Passport Update(int id, Passport uppassport)
+        public List<History> GetAllChanges(DateTime beginTime, DateTime endTime)
+        {
+            return _db.History.Where(x => x.DateChangeStatus <= beginTime).ToList();
+        }
+        public Passport Update(string id, Passport uppassport)
         {
             Passport passport = _db.Passports.Find(id);
-
-            passport.Number = uppassport.Number;
-            passport.Series = uppassport.Series;
-
+            if (uppassport.Series == 0 || uppassport.Number == 0)
+            {
+                passport.Status = uppassport.Status;
+            }
+            else
+            {
+                passport.Number = uppassport.Number;
+                passport.Series = uppassport.Series;
+                passport.Status = uppassport.Status;
+            }
             _db.SaveChanges();
             return passport;
         }
@@ -52,7 +79,12 @@ namespace WebApi.Passports
         {
             await _db.Database.ExecuteSqlRawAsync("TRUNCATE TABLE [Passports]");
         }
-        public async Task MultiThreadingAdd(List<List<Tuple<uint, uint>>> rows)
+
+        public async Task WriteTextFile()
+        {
+            await _db.Database.ExecuteSqlRawAsync("call tempPass()");
+        }
+        public async Task MultiThreadingAdd(List<List<(uint, uint)>> rows)
         {
             _taskManager.For<LoadDataTask>(0, rows.Count, p =>
              {

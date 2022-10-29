@@ -2,6 +2,6 @@
 {
     public interface IManagerFile
     {
-        public Task <List<List<Tuple<uint, uint>>>> ReadAllFileAsync(string fileName);
+        public Task <List<List<(uint, uint)>>> ReadAllFileAsync(string fileName);
     }
 }

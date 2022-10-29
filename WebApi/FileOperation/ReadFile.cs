@@ -3,11 +3,11 @@ namespace WebApi.FileOperation
 {
     public class ManagerFile : IManagerFile
     {  
-        public async Task<List<List<Tuple<uint, uint>>>> ReadAllFileAsync(string fileName)
+        public async Task<List<List<(uint, uint)>>> ReadAllFileAsync(string fileName)
         {
             int count = 1;
-            var validationList = new List<List<Tuple<uint, uint>>>();
-            var chunk = new List<Tuple<uint, uint>>(100_000);
+            var validationList = new List<List<(uint, uint)>>();
+            var chunk = new List<(uint, uint)>(100_000);
             using (StreamReader reader = new StreamReader(fileName))
             {
                 while (!reader.EndOfStream)
@@ -16,13 +16,13 @@ namespace WebApi.FileOperation
                     {
                         validationList.Add(chunk);
                         count = 1;
-                        chunk = new List<Tuple<uint, uint>>(100_000);
+                        chunk = new List<(uint, uint)>(100_000);
 
                     }
                     string[] columns = (await reader.ReadLineAsync())!.Trim().Split(',');
                     if (uint.TryParse(columns[0], out var serial) && uint.TryParse(columns[1], out var number))
                     {
-                        chunk.Add(Tuple.Create(serial, number));
+                        chunk.Add((serial, number));
                         count++;
                     }
                 }

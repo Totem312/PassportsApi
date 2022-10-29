@@ -14,6 +14,7 @@ namespace WebApi.Services
         }
         public string GetArhPath => Path.Combine(GetDirectory(), GetArhFileName());
         public string GetFilePath => Path.Combine(GetDirectory(), GetFileName());
+        public string GetTextFilePath =>Path.Combine(GetDirectory(), GetTextFileName());
         private string GetDirectory()
         {
             if (String.IsNullOrEmpty(_settings.PathTempFolder))
@@ -28,7 +29,7 @@ namespace WebApi.Services
             else
             {
                 DirectoryInfo dirInfo = new DirectoryInfo(_settings.PathTempFolder);
-                if (!dirInfo.Exists)
+                if (!dirInfo.Exists) 
                 {
                     dirInfo.Create();
                 }
@@ -59,6 +60,10 @@ namespace WebApi.Services
 
             string fileName = arrayResult[arrayResult.Length - 1];
             return  fileName+ _date ;
+        }
+        private string GetTextFileName()
+        {
+            return $"{GetNameFile()}.{_settings.TextFormat}";
         }
     }
 }
