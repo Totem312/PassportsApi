@@ -6,5 +6,6 @@
         public string Url { get; set; }
         public string FileName { get; set; }
         public string PathTempFolder { get; set; }
+        public string TextFormat { get; set; }
     }
 }

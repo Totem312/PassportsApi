@@ -4,5 +4,6 @@
     {
         string GetArhPath { get; }
         string GetFilePath { get; }
+        string GetTextFilePath { get; }
     }
 }
